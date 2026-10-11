@@ -1,0 +1,28 @@
+name: Build Dafan Arena APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Prepare output directory
+        run: mkdir -p build
+      - name: Validate project scripts
+        run: godot --headless --path . --editor --quit
+      - name: Export Android APK
+        run: godot --headless --path . --export-debug "Android" build/DafanArena.apk
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dafan-Arena-Android-APK
+          path: build/DafanArena.apk
+          if-no-files-found: error
+          retention-days: 14
